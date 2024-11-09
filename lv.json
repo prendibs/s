@@ -2,10 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "location": {
+        "lok": {
             "type": "String"
         },
-        "size": {
+        "sz": {
+            "type": "String"
+        },
+        "srv": {
             "type": "String"
         }
     },
@@ -21,7 +24,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-06-01",
             "name": "[variables('networkInterfaceName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('lok')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
             ],
@@ -43,7 +46,7 @@
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-06-01",
             "name": "[variables('virtualNetworkName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('lok')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -64,13 +67,13 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2020-06-01",
             "name": "[variables('vmName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('lok')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('size')]"
+                    "vmSize": "[parameters('sz')]"
                 },
                 "storageProfile": {
                     "osDisk": {
@@ -101,7 +104,7 @@
         "type": "Microsoft.Compute/virtualMachines/extensions",
         "apiVersion": "2015-06-15",
         "name": "[concat(variables('vmName'),'/ext')]",
-        "location": "[parameters('location')]",
+        "location": "[parameters('lok')]",
         "dependsOn": ["[concat('Microsoft.Compute/virtualMachines/',variables('vmName'))]"],
         "properties": {
             "publisher": "Microsoft.Azure.Extensions",
@@ -109,10 +112,10 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "settings": {
-                "fileUris": ["https://raw.githubusercontent.com/prendibs/s/refs/heads/main/x.sh"]
+                "fileUris": ["https://raw.githubusercontent.com/prendibs/s/refs/heads/main/s.sh"]
                 },
             "protectedSettings": {
-                "commandToExecute": "sudo sh x.sh"
+                "commandToExecute": "[concat('sudo sh s.sh ',parameters('srv'))]"
                 }
             }
         }
